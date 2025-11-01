@@ -27,8 +27,10 @@ def flip(on: bool):
     #    If the Z-gate was not present, two Hadamards would return the qubit to the |0> state.
     qc.h(0)
     qc.h(1)
-    if on:
-        qc.ry(3.1415, 0)   # Approximate π rotation bunny 0
+    if not on:
+        # Now the key part: to flip the outcome, 
+        # we apply a rotation around the Y-axis by π (180 degrees).
+        qc.ry(3.1415, 0)  
 
     # 6. Measure the qubits
     qc.measure([0, 1], [0, 1])
@@ -43,8 +45,8 @@ def flip(on: bool):
     result = job.result()
     counts = result.get_counts(qc)
     filtered_counts = {
-        'bunny 0': counts.get('00', 0),
-        'bunny 1': counts.get('01', 0)
+        'off': counts.get('00', 0),
+        'on' : counts.get('01', 0)
     }
     # 9. Print and plot the results
     print("\nMeasurement counts:", counts)
