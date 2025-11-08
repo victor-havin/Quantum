@@ -36,11 +36,12 @@ def amplitude_damping_kraus(gamma):
     K1 = np.array([[0, np.sqrt(gamma)], [0, 0]])
     return Kraus([K0, K1])
 
-# --- Build initial entangled state: (|0⟩|0⟩ + |1⟩|1⟩)/√2 ---
+# --- Build initial entangled state:  ---
 # Using DensityMatrix directly from the state vector for simplicity
 # Qubit 0: Isotope Atom, Qubit 1: Cat
-#initial_state_vector = (np.kron([1, 0], [1, 0]) + np.kron([0, 1], [0, 1])) / np.sqrt(2)
-# We start in with atom at 0.1 decayed and cat at 0.9 alive
+# initial_state_vector = 
+# (np.kron([1, 0], [1, 0])*np.sqrt(0.01) + np.kron([0, 1], [0, 1]))*np.sqrt(0.99)
+# We start in with atom at 0.01 decayed and cat at 0.99 alive
 initial_state_vector = np.sqrt(0.01)*np.kron([1, 0], [1, 0]) + np.sqrt(0.99)*np.kron([0, 1], [0, 1])
 state = DensityMatrix(initial_state_vector)
 
@@ -48,10 +49,10 @@ state = DensityMatrix(initial_state_vector)
 kraus_step = amplitude_damping_kraus(gamma_step)
 
 for _ in range(num_steps):
-    # Apply the fixed-step Kraus operator to the ayom qubit (index 0)
+    # Apply the fixed-step Kraus operator to the atom qubit (index 1)
     state = state.evolve(kraus_step, qargs=[0])
     
-    # Trace out the evolved state to get the cat's (index 1) reduced state
+    # Trace out the cat qubit (index 1) reduced state from the atom's state
     cat_state = partial_trace(state, qargs=[1]) 
     
     # P(cat dead) is the probability of the |0> state in the cat's reduced density matrix
