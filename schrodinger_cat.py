@@ -48,11 +48,11 @@ state = DensityMatrix(initial_state_vector)
 kraus_step = amplitude_damping_kraus(gamma_step)
 
 for _ in range(num_steps):
-    # Apply the fixed-step Kraus operator to the cat qubit (index 1)
-    state = state.evolve(kraus_step, qargs=[1])
+    # Apply the fixed-step Kraus operator to the ayom qubit (index 0)
+    state = state.evolve(kraus_step, qargs=[0])
     
-    # Trace out the atom qubit (index 0) to get the cat's (index 1) reduced state
-    cat_state = partial_trace(state, qargs=[0]) 
+    # Trace out the evolved state to get the cat's (index 1) reduced state
+    cat_state = partial_trace(state, qargs=[1]) 
     
     # P(cat dead) is the probability of the |0> state in the cat's reduced density matrix
     # Accordingly, P(cat alive) =is the probability of the |1> state
