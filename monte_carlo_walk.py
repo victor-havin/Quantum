@@ -70,10 +70,12 @@ def monte_carlo_walk(num_walkers, steps_per_walker, grid_size=100):
             #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             # Optimization
             # This is something quite interesting:
-            # If you uncomment this line, the interference pattern created by 
+            # If MEASURE is set to True, the interference pattern created by 
             # this simulation gets completely destroyed !!!
             # While simply trying to optimize this code, I stumbled upon
             # the famous "Measurment problem" from Quantum Mechanics
+            # If you end a single walk based on the knowlwdge of where it is,
+            # it is not wave anymore. It becomes a random particle.
             #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if(MEASURE and x > max_coord):
                 break;
