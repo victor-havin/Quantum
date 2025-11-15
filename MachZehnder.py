@@ -1,9 +1,15 @@
-# Double slit simulation
-# Works in 2 stages:
-# 1. Obtain interference pattern from a single qubit with phase modulation
-# 2. Postprocess the result classically to simulate diffraction
-# You can apply 'which-path' measurement, the interference pattern is destroyed.
-
+# Mach-Zehnder interferometer simulation
+#
+# Demonstrates the delayed choice eraser experiment
+# Simulates 2 beams:
+# Beams get separated on beam splitter and later recombined
+# This is simulated by entanglement followed by recombination
+# (measurement into the combined state)
+#
+# Grsph demonstrates interference in the abcence of
+# 'what pass' measurement.
+# With 'what pass' measurement interference vanishes.
+#
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler
 from qiskit_aer import AerSimulator
 from qiskit import QuantumCircuit, transpile
@@ -14,7 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # --- CONFIGURATION SWITCH ---
-USE_SIMULATOR = False
+USE_SIMULATOR = True
 # Set to False to run on real hardware
 # ----------------------------
 
@@ -66,28 +72,33 @@ def MachZehnder(phi_values, num_shots, which_path=False):
         all_00_counts.append(count_00)
     return np.array(all_00_counts)
 
+# Run simulation on the given array of phase shifts
+def RunSimulation(phis, samples=256):
+
+    counts_no_wp = MachZehnder(phi_values=phis, num_shots=samples, which_path=False)
+    counts_with_wp = MachZehnder(phi_values=phis, num_shots=samples, which_path=True)
+    
+    return counts_no_wp, counts_with_wp
+
+
+def PlotResults(phis, counts_no_wp, counts_with_wp):
+    fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(8, 6), sharex=True)
+
+    ax1.plot(phis, counts_no_wp, label="No which-path", color='blue')
+    ax1.set_ylabel("Beam brightness")
+    ax1.set_title("Without Which-Path Measured")
+    ax1.grid(True)
+
+    ax2.plot(phis, counts_with_wp, label="With which-path", color='red')
+    ax2.set_xlabel("Phase φ (radians)")
+    ax2.set_ylabel("Beam brightness")
+    ax2.set_title("With Which-Path Measured)")
+    ax2.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+samples = 100
 phis = np.linspace(0, 2 * np.pi, 256)
-beam1_no_wp = []
-beam1_with_wp = []
-
-counts_no_wp = MachZehnder(phi_values=phis, num_shots=256, which_path=False)
-counts_with_wp = MachZehnder(phi_values=phis, num_shots=256, which_path=True)
-
-
-# Plotting
-fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(8, 6), sharex=True)
-
-ax1.plot(phis, counts_no_wp, label="No which-path", color='blue')
-ax1.set_ylabel("Beam brightness")
-ax1.set_title("Without Which-Path Measured")
-ax1.grid(True)
-
-ax2.plot(phis, counts_with_wp, label="With which-path", color='red')
-ax2.set_xlabel("Phase φ (radians)")
-ax2.set_ylabel("Beam brightness")
-ax2.set_title("With Which-Path Measured)")
-ax2.grid(True)
-
-plt.tight_layout()
-plt.show()
-
+counts_no_wp, counts_with_wp = RunSimulation(phis, samples)
+PlotResults(phis, counts_no_wp, counts_with_wp)
