@@ -6,9 +6,8 @@
 # This is simulated by entanglement followed by recombination
 # (measurement into the combined state)
 #
-# Grsph demonstrates interference in the abcence of
-# 'what pass' measurement.
-# With 'what pass' measurement interference vanishes.
+# Graph demonstrates interference in the absence of
+# 'what pass' measurement. With 'what pass' measurement interference vanishes.
 #
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler
 from qiskit_aer import AerSimulator
