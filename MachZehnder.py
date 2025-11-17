@@ -35,7 +35,7 @@ else:
     backend = service.least_busy(operational=True, simulator=False) 
     print(f"Using IBM hardware: {backend.name}")
 
-def MachZehnder(phi_values, num_shots, which_path=False):
+def MachZehnder(phi_values, num_shots, second_splitter=True):
     # Setup quantum circuit
     qr_beam1 = QuantumRegister(1, name = 'qr_beam1')
     qr_beam2 = QuantumRegister(1, name = 'qr_beam2')
@@ -45,12 +45,10 @@ def MachZehnder(phi_values, num_shots, which_path=False):
     phi_param = Parameter('phi')
     qc.h(qr_beam1)     # Prepare in superposition
     qc.cx(qr_beam1, qr_beam2)
-    # 'which-path' measurment that destroys the interference pattern 
-    if(which_path):
-        qc.measure(qr_beam1, cr_combined[0])
     qc.rz(phi_param, qr_beam1) # Apply phase shift
-    qc.h(qr_beam1)     # restore superposition on beam1
-    qc.h(qr_beam2)     # restore superposition on beam2
+    if (second_splitter):
+        qc.h(qr_beam1)     # restore superposition on beam1
+        qc.h(qr_beam2)     # restore superposition on beam2
     qc.measure([qr_beam1[0], qr_beam2[0]], [cr_combined[0], cr_combined[1]]) # Measure to obtain the interference pattern
 
     # Run the simulation
@@ -74,8 +72,8 @@ def MachZehnder(phi_values, num_shots, which_path=False):
 # Run simulation on the given array of phase shifts
 def RunSimulation(phis, samples=256):
 
-    counts_no_wp = MachZehnder(phi_values=phis, num_shots=samples, which_path=False)
-    counts_with_wp = MachZehnder(phi_values=phis, num_shots=samples, which_path=True)
+    counts_no_wp = MachZehnder(phi_values=phis, num_shots=samples, second_splitter=True)
+    counts_with_wp = MachZehnder(phi_values=phis, num_shots=samples, second_splitter=False)
     
     return counts_no_wp, counts_with_wp
 
@@ -83,15 +81,15 @@ def RunSimulation(phis, samples=256):
 def PlotResults(phis, counts_no_wp, counts_with_wp):
     fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(8, 6), sharex=True)
 
-    ax1.plot(phis, counts_no_wp, label="No which-path", color='blue')
+    ax1.plot(phis, counts_no_wp, label="With second splitter", color='blue')
     ax1.set_ylabel("Beam brightness")
-    ax1.set_title("Without Which-Path Measured")
+    ax1.set_title("With second splitter")
     ax1.grid(True)
 
-    ax2.plot(phis, counts_with_wp, label="With which-path", color='red')
+    ax2.plot(phis, counts_with_wp, label="Without second splitter", color='red')
     ax2.set_xlabel("Phase φ (radians)")
     ax2.set_ylabel("Beam brightness")
-    ax2.set_title("With Which-Path Measured)")
+    ax2.set_title("Without second splitter)")
     ax2.grid(True)
 
     plt.tight_layout()
